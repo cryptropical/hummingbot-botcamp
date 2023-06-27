@@ -5,4 +5,4 @@ class dummy_script(ScriptStrategyBase):
     markets = {"binance_paper_trade": {"BTC-USDT"}}
 
     def on_tick(self):
-        self.logger().info("hello world")
+        self.logger().info("hello test")
