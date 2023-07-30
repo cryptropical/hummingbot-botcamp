@@ -93,7 +93,7 @@ class DollarBar(ScriptStrategyBase):
 
         df = df.join(vwap).join(vol)
 
-        self.logger().info("computing $Bar")
+        self.logger().info("computing $Bar ")
         # we compute the dollar value of each candle
 
         dollar_bars = df.groupby(self.n_bar(np.cumsum(df['vwap']), target)).agg({'vwap': 'ohlc', 'vol': 'sum'})
