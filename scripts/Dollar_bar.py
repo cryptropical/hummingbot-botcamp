@@ -75,7 +75,7 @@ class DollarBar(ScriptStrategyBase):
         for candles_info in self.candles.values():
             candles_info["candles"].stop()
 
-    def timebar2dollarbar(self, df, target=1):
+    def timebar2dollarbar(self, df, target=5):
         """
         target is the target volume of dollars per bar in millions
         """
@@ -89,21 +89,23 @@ class DollarBar(ScriptStrategyBase):
         vwap.name = 'vwap'
 
         vol = df['volume'] * vwap
-        vol.name = 'vol'
+        vol.name = '$vol'
 
         df = df.join(vwap).join(vol)
 
         self.logger().info("computing $Bar ")
         # we compute the dollar value of each candle
 
-        dollar_bars = df.groupby(self.n_bar(np.cumsum(df['vwap']), target)).agg({'vwap': 'ohlc', 'vol': 'sum'})
+        number_of_bars = self.n_bar(np.cumsum(df['$vol']), target)
+        dollar_bars = df.groupby(number_of_bars).agg({'timestamp': ['min', 'max'], '$vol': 'sum', 'vwap': 'ohlc'})
         # groupped_df = groupped_df.agg({'vwap': 'ohlc', 'vol': 'sum'})
         # nbars = self.bar(np.cumsum(df['vwap']), target)
 
-        dollar_bars_price = dollar_bars.loc[:, 'vwap']
+        # dollar_bars_price = dollar_bars.loc[:, 'vwap']
+        dollar_bars = dollar_bars.columns.droplevel(0)
         self.logger().info(f"Number of dollar bars: {len(dollar_bars)}")
 
-        return dollar_bars_price
+        return dollar_bars
 
     def n_bar(self, x, y):
         "Helper bar function to construct / return a integer number of bars."
